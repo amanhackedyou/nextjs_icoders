@@ -4,7 +4,7 @@ import styles from '../styles/Blog.module.css'
 import Link from 'next/link';
 
 
-const blog = () => {
+const Blog = () => {
   let [blogs, setBlogs] = useState([])
 
   useEffect(() => {
@@ -69,4 +69,4 @@ const blog = () => {
   );
 };
 
-export default blog;
+export default Blog;

@@ -3,7 +3,7 @@ import styles from '../../styles/BlogPost.module.css'
 import { useRouter } from 'next/router'
 
 
-const slug = () => {
+const Slug = () => {
 	let useRtr = new useRouter();
 	let { slug } = useRtr.query;
 	let [data, setData] = useState([]);
@@ -45,4 +45,4 @@ const slug = () => {
   )
 }
 
-export default slug
+export default Slug
