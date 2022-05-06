@@ -1,35 +1,13 @@
-import { React, useState, useEffect } from 'react'
+import { React, useState } from 'react'
 import styles from '../../styles/BlogPost.module.css'
-import { useRouter } from 'next/router'
+import * as fs from 'fs'
 
 
-const Slug = () => {
-	let useRtr = new useRouter();
-	let { slug } = useRtr.query;
-	let [data, setData] = useState([]);
-
-	useEffect(() => {
-		(async () => {
-			if (slug === undefined)
-			{
-				console.log("Slug not defined");
-				return 0;
-			}
-
-			let req = await fetch(`http://127.0.0.1:3000/api/getdatabyid?id=${slug}`);
-			let data = await req.json();
-			setData(data)
-		})()
-	}, [])
-
+const Slug = (props) => {
+	let [data, setData] = useState(props.Data);
 
   	return (
 	 <div className={styles.container}>
-		{/* <h1 className={styles.heading}>How to learn Java?</h1>
-		<p className={styles.content}>
-			Lorem ipsum dolor sit amet consectetur adipisicing elit.Cum quibusdam, ullam impedit ea aut quis reiciendis culpa magnam deleniti temporibus molestias harum fugiat aliquid perspiciatis voluptatum est autem totam excepturi consequatur earum sapiente eum, veritatis doloribus.
-		</p> */}
-
 		{
 			data.length !== 0?(
 				<>
@@ -40,9 +18,44 @@ const Slug = () => {
 				</>
 			):''
 		}
-
 	 </div>
   )
+}
+
+export async function getStaticPaths(){
+	let ret = {
+		paths: [],
+		fallback: true
+	}
+
+	let data = fs.readFileSync("DB/db.json", "utf-8");
+	data = JSON.parse(data);
+	let numberOfBlogs = Object.keys(data).length;
+
+	for (let i=1; i<=numberOfBlogs; i++){
+		ret.paths.push({params: {slug: `${i}`}})
+	}
+	return ret;
+}
+
+export async function getStaticProps(context){
+	let id = context.params.slug;
+	let data = fs.readFileSync("DB/db.json", "utf-8");
+	data = JSON.parse(data);
+	data = data[id]
+	if (data !== undefined)
+		return {
+			props: {
+				Data: data
+			}
+		}
+	else{
+		return {
+			props: {
+				Data: []
+			}
+		}
+	}
 }
 
 export default Slug

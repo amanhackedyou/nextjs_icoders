@@ -1,24 +1,11 @@
 import { React, useEffect, useState } from "react";
-import Head from 'next/head'
-import styles from '../styles/Blog.module.css'
-import Link from 'next/link';
+import * as fs from "fs";
+import Head from "next/head";
+import styles from "../styles/Blog.module.css";
+import Link from "next/link";
 
-
-const Blog = () => {
-  let [blogs, setBlogs] = useState([])
-
-  useEffect(() => {
-    ( async () => {
-        let allPosts = []
-        let reqst = await fetch("http://127.0.0.1:3000/api/getalldata");
-        let data = await reqst.json();
-        let totelBlogNum = Object.keys(data).length
-        for (let i=1; i<=totelBlogNum; i++){
-          allPosts.push(data[`${i}`]);
-        }
-        setBlogs(allPosts);
-    })()
-  }, [])
+const Blog = (props) => {
+  let [blogs, setBlogs] = useState(props.Data);
 
   return (
     <div className={styles.container}>
@@ -29,44 +16,49 @@ const Blog = () => {
       </Head>
 
       <main className={styles.main}>
-			<h1 style={{textAlign: 'center'}}>Latest Blog</h1>
-
-
+        <h1 style={{ textAlign: "center" }}>Latest Blog</h1>
 
         <div className={styles.grid}>
-		  		{/* <Link href={`blogpost/how-to-learn-java`} >
+          {/* <Link href={`blogpost/how-to-learn-java`} >
 			  <div className={styles.card}>
             <h2>How to learn Java?</h2>
             <p>Find in-depth information about Next...</p>
 			  </div>
           </Link> */}
 
-
-
-
-        {
-          // blogs.map(e => {
-          //   <h1>Hii</h1>
-          // })
-
-          blogs.length !== 0?blogs.map((blog, i) => {
+          {blogs.map((blog, i) => {
             return (
-              <Link key={i} href={`blogpost/${i+1}`} >
+              <Link key={i} href={`blogpost/${i + 1}`}>
                 <div className={styles.card}>
                   <h2>{blog.Title}</h2>
-                  <p>blog.Content</p>
+                  <p>{blog.Content.slice(0, 70) + "..."}</p>
                 </div>
               </Link>
-            )
-          }):''
-        }
-
-
-
+            );
+          })}
         </div>
       </main>
     </div>
   );
 };
+
+export async function getStaticProps(context) {
+  let mainData = [];
+
+  let data = fs.readFileSync("DB/db.json", "utf-8");
+  data = JSON.parse(data);
+
+  let totelBlogCount = Object.keys(data).length;
+
+  for (let i = 1; i <= totelBlogCount; i++) {
+    mainData.push(data[`${i}`]);
+  }
+
+  return {
+    props: {
+      Data: mainData,
+    },
+  };
+}
 
 export default Blog;

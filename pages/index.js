@@ -1,7 +1,13 @@
+import { useState } from 'react'
 import Head from 'next/head'
+import Link from 'next/link'
+import * as fs from 'fs'
 import styles from '../styles/Home.module.css'
 
-export default function Home() {
+export default function Home(props) {
+  let [blogs, setBlogs] = useState(props.Data)
+  // console.log(blogs);
+
   return (
     <div className={styles.container}>
       <Head>
@@ -14,71 +20,19 @@ export default function Home() {
         <h1 className={styles.title}>
           Welcome to iCoders
         </h1>
-
-        <h2 className={styles.heading2}>RECENT BLOGS</h2>
         <div className={styles.grid}>
-
-          <div className={styles.card}>
-            <h2>How to learn Java?</h2>
-            <p>Find in-depth information about Next...</p>
-          </div>
-
-          <div className={styles.card}>
-            <h2>How to learn Python?</h2>
-            <p>Find in-depth information about Next...</p>
-          </div>
-
-          <div className={styles.card}>
-            <h2>How to learn JavaScript?</h2>
-            <p>Find in-depth information about Next...</p>
-          </div>
-
-          <div className={styles.card}>
-            <h2>How to learn Java?</h2>
-            <p>Find in-depth information about Next...</p>
-          </div>
-
-          <div className={styles.card}>
-            <h2>How to learn Python?</h2>
-            <p>Find in-depth information about Next...</p>
-          </div>
-
-          <div className={styles.card}>
-            <h2>How to learn JavaScript?</h2>
-            <p>Find in-depth information about Next...</p>
-          </div>
-
-          <div className={styles.card}>
-            <h2>How to learn Java?</h2>
-            <p>Find in-depth information about Next...</p>
-          </div>
-
-          <div className={styles.card}>
-            <h2>How to learn Python?</h2>
-            <p>Find in-depth information about Next...</p>
-          </div>
-
-          <div className={styles.card}>
-            <h2>How to learn JavaScript?</h2>
-            <p>Find in-depth information about Next...</p>
-          </div>
-
-          <div className={styles.card}>
-            <h2>How to learn Java?</h2>
-            <p>Find in-depth information about Next...</p>
-          </div>
-
-          <div className={styles.card}>
-            <h2>How to learn Python?</h2>
-            <p>Find in-depth information about Next...</p>
-          </div>
-
-          <div className={styles.card}>
-            <h2>How to learn JavaScript?</h2>
-            <p>Find in-depth information about Next...</p>
-          </div>
-
-          
+          {
+            blogs.map((blog, i) => {
+              return (
+                <Link key={i} href={`blogpost/${i+1}`} >
+                  <div className={styles.card}>
+                    <h2>{blog.Title}</h2>
+                    <p>{blog.Content.slice(0, 70)+'...'}</p>
+                  </div>
+                </Link>
+              )
+            })
+        }
         </div>
       </main>
 
@@ -88,4 +42,23 @@ export default function Home() {
       </footer>
     </div>
   )
+}
+
+export async function getStaticProps(context) {
+  let mainData = [];
+
+  let data = fs.readFileSync("DB/db.json", "utf-8");
+	data = JSON.parse(data);
+
+  let totelBlogCount = Object.keys(data).length;
+
+  for (let i=1; i<=totelBlogCount; i++){
+    mainData.push(data[`${i}`]);
+  }
+  
+  return {
+    props: {
+      Data: mainData
+    } 
+  }
 }
